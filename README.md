@@ -15,8 +15,8 @@ Good news is that one half of the equation is already done (the administrator ac
 Tip: Use an automated resource deployment method such as CloudFormation [StackSets](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-prereqs.html) to deploy new AWS resources such as IAM roles in a scalable and consistent way.
 
 Each of the following items has to be configured for the solution to work.
-1. Name of the IAM role has to be the **same** across all AWS accounts (ie. cost-optimization-get-cw-data). The name of the role will be used later as a CloudFormation input.
-1. IAM Role with the following permissions 
+1. Name of the IAM role has to be the **same** across all AWS accounts (ie. cost-optimization-get-cw-data). The name of the role will be used later as a CloudFormation input to feed into the code.
+2. IAM Role with the following permissions 
 ```json
 {
     "Version": "2012-10-17",
@@ -33,7 +33,7 @@ Each of the following items has to be configured for the solution to work.
     ]
 }
 ```
-1. IAM Role's Trust Relationship with the following policy document
+3. IAM Role's Trust Relationship with the following policy document
 
 ```json
 {
@@ -50,7 +50,7 @@ Each of the following items has to be configured for the solution to work.
       "Sid": "AllowingCrossAccountCWScraper",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::**<CentralAWSAccountID>**:root"
+        "AWS": "arn:aws:iam::<AdministratorAWSAccountID>:root"
       },
       "Action": "sts:AssumeRole"
     }
