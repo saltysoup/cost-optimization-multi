@@ -1,11 +1,14 @@
 # AWS Cost Optimization: EC2 Right Sizing
-Source code for the AWS solution "Cost Optimization: EC2 Right Sizing". Please see the main solution for the [Cost Optimization: EC2 Right Sizing](https://aws.amazon.com/answers/account-management/cost-optimization-ec2-right-sizing/).
+**THIS IS A PERSONAL PROJECT. Not an official Amazon solution!**
 
-## Cloudformation template
+Based on the AWS solution "Cost Optimization: EC2 Right Sizing". Please see the main solution for the [Cost Optimization: EC2 Right Sizing](https://aws.amazon.com/answers/account-management/cost-optimization-ec2-right-sizing/).
 
-- cost-optimization-ec2-right-sizing.template
 
-You will need to replace %%BUCKET_NAME%% in the template to point to the bucket where you put your own copies of the Python source code below.
+## Pre-Requisites
+
+To grab data from multiple AWS accounts, the solution uses an IAM role from a central account that assumes into *n* child accounts. This is possible because of:
+>For example, if you switch to RoleA, IAM uses your original user or federated role credentials to determine if you are allowed to assume RoleA. If you then switch to RoleB *while you are using RoleA*, IAM still uses your **original** user or federated role credentials to authorize the switch, not the credentials for RoleA.  
+[source AWS doc link](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-console.html)
 
 ## Python source code
 
