@@ -6,9 +6,58 @@ Based on the AWS solution "Cost Optimization: EC2 Right Sizing". Please see the 
 
 ## Pre-Requisites
 
-To grab data from multiple AWS accounts, the solution uses an IAM role from a central account that assumes into *n* child accounts. This is possible because of:
+To grab data from multiple AWS accounts, this solution uses an IAM role from an administrator account (where you launch the cloudformation stack) that assumes into *n* child accounts. This is possible because of:
 >For example, if you switch to RoleA, IAM uses your original user or federated role credentials to determine if you are allowed to assume RoleA. If you then switch to RoleB *while you are using RoleA*, IAM still uses your **original** user or federated role credentials to authorize the switch, not the credentials for RoleA.  
 [source AWS doc link](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-console.html)
+
+Good news is that one half of the equation is already done (the administrator account's IAM role used by EC2 worker). You will now need to create a new IAM role in each of the target accounts (including in the administrator account itself) to allow cross account role assumption.
+
+Tip: Use an automated resource deployment method such as CloudFormation [StackSets](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-prereqs.html) to deploy new AWS resources such as IAM roles in a scalable and consistent way.
+
+Each of the following items has to be configured for the solution to work.
+1. Name of the IAM role has to be the **same** across all AWS accounts (ie. cost-optimization-get-cw-data). The name of the role will be used later as a CloudFormation input.
+1. IAM Role with the following permissions 
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "MultiAccountCostOptimization",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:Describe*",
+                "cloudwatch:GetMetricStatistics"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+1. IAM Role's Trust Relationship with the following policy document
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    },
+    {
+      "Sid": "AllowingCrossAccountCWScraper",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::**<CentralAWSAccountID>**:root"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+```
+**Remember**, the above IAM role has to be created for the administrator account as well as the EC2 worker assumes into itself as well.
 
 ## Python source code
 
