@@ -33,7 +33,7 @@ Each of the following items has to be configured for the solution to work.
     ]
 }
 ```
-3. IAM Role's Trust Relationship with the following policy document. Replace <AdministratorAWSAccountID> with your 12 digit account ID
+3. IAM Role's Trust Relationship with the following policy document. Replace **<AdministratorAWSAccountID>** with your 12 digit account ID
 
 ```json
 {
