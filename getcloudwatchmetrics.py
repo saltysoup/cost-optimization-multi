@@ -51,7 +51,7 @@ def getInstances(region, sts_credentials):
                 if instance["State"]["Name"] == "running":
                     instance["OwnerAccountId"] = account
                     runningInstances.append(instance)
-                    #countInstance.append(instance["InstanceId"])
+                    
 
     return runningInstances
 
@@ -78,7 +78,7 @@ def getMetrics(intNow, startTime, endTime, period, statistics, unit, metrics, ou
         numRetries = 0
         gettingMetrics = True
         while gettingMetrics:
-        	try:
+        	try: # using temp credentials received from STS for target account
                     session = boto3.session.Session(
                         region_name=instance["Placement"]["AvailabilityZone"][:-1],
                         aws_access_key_id=sts_credentials['Credentials']['AccessKeyId'],

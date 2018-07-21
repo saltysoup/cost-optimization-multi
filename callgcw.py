@@ -89,4 +89,4 @@ def call_gcw(p_region, p_account, p_mode, p_statistics, p_period, p_starttime, p
                 os.system('type ' + ls_outputfile_name + ' >> ' + ls_combined_csv)
                 os.system('del ' + ls_outputfile_name)
 
-    return ls_combined_csv
+    return ls_combined_csv # this file will be appended with cloudwatch data until the last aws account in list, where it will uploaded to S3
