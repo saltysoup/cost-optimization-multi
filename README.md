@@ -4,7 +4,7 @@
 Based on the AWS solution "Cost Optimization: EC2 Right Sizing". Please see the main solution for the [Cost Optimization: EC2 Right Sizing](https://aws.amazon.com/answers/account-management/cost-optimization-ec2-right-sizing/).
 
 
-## Pre-Requisites
+## Prerequisites
 
 To grab data from multiple AWS accounts, this solution uses an IAM role from an administrator account (where you launch the cloudformation stack) that assumes into *n* child accounts. This is possible because of:
 >For example, if you switch to RoleA, IAM uses your original user or federated role credentials to determine if you are allowed to assume RoleA. If you then switch to RoleB *while you are using RoleA*, IAM still uses your **original** user or federated role credentials to authorize the switch, not the credentials for RoleA.  
@@ -58,6 +58,14 @@ Each of the following items has to be configured for the solution to work.
 }
 ```
 **Remember**, the above IAM role has to be created for the administrator account as well as the EC2 worker assumes into itself as well.
+
+## Instructions
+
+Once the IAM roles has been configured in each AWS Accounts, launch a new CloudFormation stack in the administrator account using the cost-optimization-ec2-right-sizing.json template in this repo.
+
+In the launch parameters, input the AWS accounts and the name of the AWS Role that was configured in prerequisites.
+
+The stack will take about 20min to finish (more for larger number of AWS accounts), with the results stored in the S3Bucket in the Resources tab.
 
 ## Python source code
 
