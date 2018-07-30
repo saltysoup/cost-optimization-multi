@@ -27,12 +27,12 @@
         "AWSAccounts": {
             "Description": "A comma separated list of one or more accounts",
             "Type": "String",
-            "Default": "account 1, account 2, etc"
+            "Default": "111111111111,222222222222, ... etc"
         },
-        "AWSRole": {
-            "Description": "Name of IAM role configured for cross account access",
+        "IAMRole": {
+            "Description": "Name of IAM role configured for cross account access as per prerequisites instructions",
             "Type": "String",
-            "Default": "Friendly Role Name"
+            "Default": "cost-optimization-get-cw-data"
         },
         "SendAnonymousData": {
             "Description": "Send anonymous data to AWS",
@@ -546,7 +546,7 @@
                                                     "",
                                                     [
                                                         {
-                                                            "Ref": "AWSRole"
+                                                            "Ref": "IAMRole"
                                                         }
                                                     ]
                                                 ]
