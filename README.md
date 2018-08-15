@@ -10,13 +10,13 @@ To grab data from multiple AWS accounts, this solution uses an IAM role from an 
 >For example, if you switch to RoleA, IAM uses your original user or federated role credentials to determine if you are allowed to assume RoleA. If you then switch to RoleB *while you are using RoleA*, IAM still uses your **original** user or federated role credentials to authorize the switch, not the credentials for RoleA.  
 [source AWS doc link](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-console.html)
 
-Good news is that one half of the equation is already done (the administrator account's IAM role used by EC2 worker). You will now need to create a new IAM role in each of the target accounts (including in the administrator account itself) to allow cross account role assumption.
+Good news is that one half of the equation is already done (the EC2 worker in the admin account has sts:assumerole permission). You will now need to create a new IAM role in each of the target accounts (including in the administrator account itself) to allow cross account role assumption.
 
 Tip: Use an automated resource deployment method such as CloudFormation [StackSets](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-prereqs.html) to deploy new AWS resources such as IAM roles in a scalable and consistent way.
 
 Each of the following items has to be configured for the solution to work.
 1. Name of the IAM role has to be the **same** across all AWS accounts (ie. cost-optimization-get-cw-data). The name of the role will be used later as a CloudFormation input to feed into the code.
-2. IAM Role with the following permissions 
+2. IAM Role (cost-optimization-get-cw-data) with the following permissions to scrape CW data
 ```json
 {
     "Version": "2012-10-17",
@@ -33,7 +33,7 @@ Each of the following items has to be configured for the solution to work.
     ]
 }
 ```
-3. IAM Role's Trust Relationship with the following policy document. Replace **\<AdministratorAWSAccountID\>** with your 12 digit account ID
+3. The IAM Role has a Trust Relationship with the administrator account. See example policy document below. Replace **\<AdministratorAWSAccountID\>** with your 12 digit account ID
 
 ```json
 {
@@ -57,7 +57,7 @@ Each of the following items has to be configured for the solution to work.
   ]
 }
 ```
-**Remember**, the above IAM role has to be created for the administrator account as well as the EC2 worker assumes into itself as well.
+**Remember, the above IAM role has to be created for the administrator account as well as the EC2 worker assumes into itself as well.**
 
 ## Instructions
 
@@ -65,7 +65,7 @@ Once the IAM roles has been configured in each AWS Accounts, launch a new CloudF
 
 In the launch parameters, input the AWS accounts and the name of the AWS Role that was configured in prerequisites.
 
-The stack will take about 20min to finish (more for larger number of AWS accounts), with the results stored in the S3Bucket in the Resources tab.
+The stack will take about 15min to finish (more for larger number of AWS accounts), with the results stored in the S3Bucket in the Resources tab.
 
 ## Python source code
 
