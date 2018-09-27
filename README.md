@@ -81,7 +81,7 @@ This will enable an administrative account to push CloudFormation StackSets to s
     
 1. Create the **StackSetExecution** role to both the **administrative account** and all **sub-accounts** by executing the following command.
 
-`Make sure to replace <ADMINACCOUNTID> with your own administrative account ID`:
+`Make sure to replace <ADMINACCOUNTID> with your own admin account ID below`:
 
   ``` shell
   aws cloudformation create-stack --stack-name cfn-stackset-execution-role --template-body file://AWSCloudFormationStackSetExecutionRole.yml --parameters ParameterKey=AdministratorAccountId,ParameterValue=<ADMINACCOUNTID> --capabilities CAPABILITY_NAMED_IAM --region us-east-1
