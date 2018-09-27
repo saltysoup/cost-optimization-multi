@@ -4,7 +4,7 @@
 Based on the AWS solution "Cost Optimization: EC2 Right Sizing". Please see the main solution for the [Cost Optimization: EC2 Right Sizing](https://aws.amazon.com/answers/account-management/cost-optimization-ec2-right-sizing/).
 
 
-## Prerequisites
+# How the Solution Works
 
 To grab data from multiple AWS accounts, this solution uses an IAM role from an administrator account (where you launch the cloudformation stack) that assumes into *n* child accounts. This is possible because of:
 >For example, if you switch to RoleA, IAM uses your original user or federated role credentials to determine if you are allowed to assume RoleA. If you then switch to RoleB *while you are using RoleA*, IAM still uses your **original** user or federated role credentials to authorize the switch, not the credentials for RoleA.  
@@ -12,11 +12,14 @@ To grab data from multiple AWS accounts, this solution uses an IAM role from an 
 
 Good news is that one half of the equation is already done (the EC2 worker in the admin account has sts:assumerole permission). You will now need to create a new IAM role in each of the target accounts (including in the administrator account itself) to allow cross account role assumption.
 
-Tip: Use an automated resource deployment method such as CloudFormation [StackSets](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-prereqs.html) to deploy new AWS resources such as IAM roles in a scalable and consistent way.
+# Prerequisites
+
+## Configure IAM roles across AWS Accounts
 
 Each of the following items has to be configured for the solution to work.
+
 1. Name of the IAM role has to be the **same** across all AWS accounts (ie. cost-optimization-get-cw-data). The name of the role will be used later as a CloudFormation input to feed into the code.
-2. IAM Role (cost-optimization-get-cw-data) with the following permissions to scrape CW data
+2. IAM Role (cost-optimization-get-cw-data) with the following permissions to scrape CW data. Create a new policy if needed.
 ```json
 {
     "Version": "2012-10-17",
@@ -59,13 +62,46 @@ Each of the following items has to be configured for the solution to work.
 ```
 **Remember, the above IAM role has to be created for the administrator account as well as the EC2 worker assumes into itself as well.**
 
-## Instructions
+## [Optional] Using CloudFormation StackSets to deploy IAM roles
 
-Once the IAM roles has been configured in each AWS Accounts, launch a new CloudFormation stack in the administrator account using the cost-optimization-ec2-right-sizing.json template in this repo.
+This will enable an administrative account to push CloudFormation StackSets to sub-accounts.
 
-In the launch parameters, input the AWS accounts and the name of the AWS Role that was configured in prerequisites.
+1. Create the **StackSet Administration** role in the **administrative account**, by executing the following command:
 
-The stack will take about 15min to finish (more for larger number of AWS accounts), with the results stored in the S3Bucket in the Resources tab.
+    Go into the templates directory
+    ``` shell
+    cd cost-optimization-multi/
+    cd templates/
+    ```
+
+    Deploy the **StackSetAdministration** role with the AWS CLI tool
+    ```shell
+    aws cloudformation create-stack --stack-name cfn-stackset-admin-role --template-body file://AWSCloudFormationStackSetAdministrationRole.yml --capabilities CAPABILITY_NAMED_IAM --region us-east-1
+    ```
+    
+1. Create the **StackSetExecution** role to both the **administrative account** and all **sub-accounts** by executing the following command.
+
+`Make sure to replace <ADMINACCOUNTID> with your own administrative account ID`:
+
+    ``` shell
+    aws cloudformation create-stack --stack-name cfn-stackset-execution-role --template-body file://AWSCloudFormationStackSetExecutionRole.yml --parameters ParameterKey=AdministratorAccountId,ParameterValue=<ADMINACCOUNTID> --capabilities CAPABILITY_NAMED_IAM --region us-east-1
+    ```
+
+# Instructions
+
+1. Clone into the repo
+
+    ```shell
+    git clone https://github.com/saltysoup/cost-optimization-multi.git
+    ```
+
+1. Verify that the prereq IAM roles has been created in each AWS accounts
+
+1. Create a new CloudFormation stack from the **administrator account** using **cost-optimization-ec2-right-sizing.json** in the templates directory.
+
+1. In the launch parameters, input the AWS accounts and the name of the AWS Role that was configured in prerequisites.
+
+1. The stack will take about 15min to finish (more for larger number of AWS accounts), with the results stored in the S3Bucket in the Resources tab.
 
 ## Python source code
 
