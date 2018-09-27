@@ -83,9 +83,9 @@ This will enable an administrative account to push CloudFormation StackSets to s
 
 `Make sure to replace <ADMINACCOUNTID> with your own administrative account ID`:
 
-    ``` shell
-    aws cloudformation create-stack --stack-name cfn-stackset-execution-role --template-body file://AWSCloudFormationStackSetExecutionRole.yml --parameters ParameterKey=AdministratorAccountId,ParameterValue=<ADMINACCOUNTID> --capabilities CAPABILITY_NAMED_IAM --region us-east-1
-    ```
+  ``` shell
+  aws cloudformation create-stack --stack-name cfn-stackset-execution-role --template-body file://AWSCloudFormationStackSetExecutionRole.yml --parameters ParameterKey=AdministratorAccountId,ParameterValue=<ADMINACCOUNTID> --capabilities CAPABILITY_NAMED_IAM --region us-east-1
+  ```
 
 # Instructions
 
@@ -103,14 +103,14 @@ This will enable an administrative account to push CloudFormation StackSets to s
 
 1. The stack will take about 15min to finish (more for larger number of AWS accounts), with the results stored in the S3Bucket in the Resources tab.
 
-## Python source code
+# Python source codes
 
 - callgcw.py
 - deleteandterminate.py
 - getcloudwatchmetrics.py
 - run-rightsizing-redshift.py
 
-## Troubleshooting
+# Troubleshooting
 Log files are exported to the CloudWatch Logs log group cost-optimization-ec2-right-sizing, log streams:
 {instance_id}/cfn-init.log
 {instance_id}/run-rightsizing-redshift.log
