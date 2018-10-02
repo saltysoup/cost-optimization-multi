@@ -1,0 +1,57 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Creates a stack containing an IAM role used to grant permission for 
+  CloudWatch metrics to be pulled from sub-accounts for utilization reporting.
+  Created by Luke Youngblood, lukey@amazon.com
+
+Parameters:
+  AwsAccountId:
+    Type: Number
+    Description: Account number of the AWS account to which to grant read access for
+      utilization collection and reporting purposes.
+
+Resources:
+
+  AwsIntegrationCrossAccountRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: cloudwatch-utilization-reporting-role
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+        Statement:
+        - Effect: Allow
+          Principal:
+            AWS: !Sub arn:aws:iam::${AwsAccountId}:root
+          Action:
+          - sts:AssumeRole
+
+  AwsIntegrationCrossAccountPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: cost-optimization-get-cw-data
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Action:
+          - ec2:Describe*
+          - cloudwatch:GetMetricStatistics
+          Effect: Allow
+          Resource: "*"
+      Roles: [!Ref AwsIntegrationCrossAccountRole]
+
+Outputs:
+  RoleId:
+    Description: The logical ID of the IAM role
+    Value: !Ref AwsIntegrationCrossAccountRole
+  RoleArn:
+    Description: The ARN of the IAM role
+    Value: !GetAtt [AwsIntegrationCrossAccountRole, Arn]
+  PolicyId:
+    Description: The logical ID of the IAM policy
+    Value: !Ref AwsIntegrationCrossAccountPolicy

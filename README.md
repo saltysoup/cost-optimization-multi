@@ -1,7 +1,8 @@
 # AWS Cost Optimization: EC2 Right Sizing
-**THIS IS A PERSONAL PROJECT. Not an official Amazon solution!**
 
-Based on the AWS solution "Cost Optimization: EC2 Right Sizing". Please see the main solution for the [Cost Optimization: EC2 Right Sizing](https://aws.amazon.com/answers/account-management/cost-optimization-ec2-right-sizing/).
+A multiple account fork of the AWS solution "Cost Optimization: EC2 Right Sizing".
+
+For the original solution, please see [Cost Optimization: EC2 Right Sizing](https://aws.amazon.com/answers/account-management/cost-optimization-ec2-right-sizing/).
 
 
 # How the Solution Works
@@ -62,9 +63,12 @@ Each of the following items has to be configured for the solution to work.
 ```
 **Remember, the above IAM role has to be created for the administrator account as well as the EC2 worker assumes into itself as well.**
 
-## [Optional] Using CloudFormation StackSets to deploy IAM roles
+## [Example] Using CloudFormation StackSets to deploy IAM roles
 
-This will enable an administrative account to push CloudFormation StackSets to sub-accounts.
+This will enable an administrative account to push [CloudFormation StackSets](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/what-is-cfnstacksets.html) to sub-accounts for creating the required IAM roles. For StackSets to work, it requires a one time set up to [grant permissions for Stack Set Operations](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-prereqs.html).
+Use the following instructions to set this up using the provided cloudformation templates.
+
+### Setting up CloudFormation StackSets
 
 1. Create the **StackSet Administration** role in the **administrative account**, by executing the following command:
 
@@ -87,6 +91,12 @@ This will enable an administrative account to push CloudFormation StackSets to s
   aws cloudformation create-stack --stack-name cfn-stackset-execution-role --template-body file://AWSCloudFormationStackSetExecutionRole.yml --parameters ParameterKey=AdministratorAccountId,ParameterValue=<ADMINACCOUNTID> --capabilities CAPABILITY_NAMED_IAM --region us-east-1
   ```
 
+### Deploying the prerequisite IAM roles for AWS Cost Optimization: EC2 Right Sizing
+
+1. Create the cost-optimization-get-cw-data role in each of the accounts, including the **administrative account** by deploying the `cost-optimization-role-stackset.yaml` CloudFormation template as a StackSet across all sub-accounts.
+
+
+
 # Instructions
 
 1. Clone into the repo
@@ -99,7 +109,7 @@ This will enable an administrative account to push CloudFormation StackSets to s
 
 1. Create a new CloudFormation stack from the **administrator account** using **cost-optimization-ec2-right-sizing.json** in the templates directory.
 
-1. In the launch parameters, input the AWS accounts and the name of the AWS Role that was configured in prerequisites.
+1. In the launch parameters, input the AWS accounts (including the administrative account) and the name of the AWS Role that was configured in prerequisites.
 
 1. The stack will take about 15min to finish (more for larger number of AWS accounts), with the results stored in the S3Bucket in the Resources tab.
 
@@ -122,6 +132,9 @@ Log files are also located locally on the solution created EC2 instance (if you 
 /tmp/deleteandterminate.log
 
 
+***
+
+*Authors: Injae Kwak (injakwak@amazon.com) and Luke Youngblood (lukey@amazon.com)*
 
 ***
 
